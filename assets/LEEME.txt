@@ -1,0 +1,28 @@
+Archivos que la guia espera (sueltalos con este nombre exacto y aparecen solos):
+
+logos/
+  logo-conal.png      Palabra CONAL con la orquidea en la O (PNG/SVG con fondo transparente)
+  logo-aneiap.png     Logo ANEIAP
+  sello-conal.png     Sello circular "El camino del silletero"
+  favicon.png         Icono de la pestana (32x32 o 180x180)
+
+fotos/
+  hero.jpg            Foto de fondo del inicio (horizontal, min. 1600px de ancho)
+  bienvenida.jpg      Foto del modal de bienvenida (16:9)
+  comunidad.jpg       Foto grande del bloque de cierre del inicio
+  cronograma.jpg      Foto que encabeza el cronograma
+  faq.jpg             Foto de la seccion de preguntas frecuentes (4:3)
+
+sedes/
+  sede-1.jpg          Sede del dia 1
+  sede-2.jpg          Sede de los dias 2 y 3
+
+vestimenta/
+  dia-1.jpg  dia-2.jpg  dia-3.jpg    Ejemplos de vestimenta (vertical 4:5)
+
+comite/
+  contacto-1.jpg ... contacto-6.jpg  Fotos del comite (cuadradas)
+
+guia-conal-2026.pdf   PDF descargable (va directo en /assets/)
+
+Si cambias un nombre, actualizalo tambien en content.js.

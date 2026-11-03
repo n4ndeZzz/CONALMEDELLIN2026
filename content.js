@@ -49,6 +49,21 @@ window.CONTENT = {
     // Imagen del lema "Sembrando ideas, cosechando impacto" (va debajo del logo en el inicio).
     lemaImg: './assets/logos/texto-conal.jpeg',
     logoAneiap: './assets/logos/logo-aneiap.png',
+
+    /* Decoraciones del logo (PNG transparentes) que adornan los títulos de sección.
+       "forma" decide dónde se ubican; "color" sirve para no ponerlas sobre un fondo
+       del mismo color (ej. las moradas no van en la sección morada). */
+    decoraciones: [
+      { archivo: './assets/logos/deco-01-gotas-verdes-izq.png',  forma: 'gotas-izq', color: 'verde' },
+      { archivo: './assets/logos/deco-07-gotas-verdes-der.png',  forma: 'gotas-der', color: 'verde' },
+      { archivo: './assets/logos/deco-02-estrella-rosa.png',     forma: 'estrella',  color: 'fucsia' },
+      { archivo: './assets/logos/deco-08-estrella-amarilla.png', forma: 'estrella',  color: 'amarillo' },
+      { archivo: './assets/logos/deco-09-estrella-morada.png',   forma: 'estrella',  color: 'morado' },
+      { archivo: './assets/logos/deco-04-abanico-morado.png',    forma: 'abanico',   color: 'morado' },
+      { archivo: './assets/logos/deco-05-abanico-naranja.png',   forma: 'abanico',   color: 'naranja' },
+      { archivo: './assets/logos/deco-03-gota-morada-arriba.png',forma: 'gota',      color: 'morado' },
+      { archivo: './assets/logos/deco-06-gota-rosa.png',         forma: 'gota',      color: 'fucsia' }
+    ],
     sello: './assets/logos/sello-conal.png'
   },
 

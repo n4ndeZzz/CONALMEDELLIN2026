@@ -111,26 +111,50 @@
     });
   }
 
-  /** Garabatos tipo confeti alrededor de los títulos. */
+  /** Hueco para las decoraciones del título; decorarTitulos() lo llena según el fondo de la sección. */
   function doodles() {
-    var shapes = [
-      { t: 'star', c: 'fucsia',  s: 'left:4%;top:4px',          z: 18 },
-      { t: 'wave', c: 'amarillo',s: 'right:6%;top:0',           z: 26 },
-      { t: 'drop', c: 'morado',  s: 'left:12%;top:52px',        z: 14 },
-      { t: 'oval', c: 'azul',    s: 'right:12%;top:48px',       z: 20 },
-      { t: 'star', c: 'naranja', s: 'right:2%;top:84px',        z: 13 },
-      { t: 'dash', c: 'verde',   s: 'left:1%;top:92px',         z: 20 }
-    ];
-    var art = {
-      star: '<svg viewBox="0 0 24 24"><path d="M12 0c1 7 5 11 12 12-7 1-11 5-12 12-1-7-5-11-12-12C7 11 11 7 12 0Z" fill="currentColor"/></svg>',
-      drop: '<svg viewBox="0 0 24 24"><path d="M12 2c5 7 8 10 8 14a8 8 0 0 1-16 0c0-4 3-7 8-14Z" fill="currentColor"/></svg>',
-      oval: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="6" fill="none" stroke="currentColor" stroke-width="2.6" transform="rotate(-25 12 12)"/></svg>',
-      wave: '<svg viewBox="0 0 40 16"><path d="M2 10c5-9 9 1 14-5s9 9 14 3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
-      dash: '<svg viewBox="0 0 24 24"><path d="M4 18 12 6M12 20l6-9" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg>'
-    };
-    return '<span class="doodles" aria-hidden="true">' + shapes.map(function (d) {
-      return '<span class="doodle" style="' + d.s + ';width:' + d.z + 'px;height:' + d.z + 'px;color:var(--' + d.c + ')">' + art[d.t] + '</span>';
-    }).join('') + '</span>';
+    return '<span class="doodles" aria-hidden="true"></span>';
+  }
+
+  // Colores de decoración que no se verían sobre cada fondo de sección.
+  var DECO_CHOCA = {
+    'sec--fucsia': ['fucsia', 'morado'],
+    'sec--morado': ['morado'],
+    'sec--amarillo': ['amarillo']
+  };
+
+  // Dónde va cada forma alrededor del título (y su ancho en px).
+  var DECO_SLOTS = [
+    { forma: 'gotas-izq', css: 'left:1%;top:-6px',   w: 40 },
+    { forma: 'gotas-der', css: 'right:1%;top:-4px',  w: 34 },
+    { forma: 'estrella',  css: 'left:9%;top:58px',   w: 26 },
+    { forma: 'abanico',   css: 'right:9%;top:52px',  w: 38 },
+    { forma: 'gota',      css: 'left:15%;top:6px',   w: 10 },
+    { forma: 'estrella',  css: 'right:3%;top:96px',  w: 20 }
+  ];
+
+  /**
+   * Pone las decoraciones del logo (content.js → meta.decoraciones) alrededor de
+   * cada título. Rota las variantes de sección en sección y evita las que
+   * chocan con el color de fondo.
+   */
+  function decorarTitulos() {
+    var decos = C.meta.decoraciones || [];
+    if (!decos.length) return;
+    $$('.sec').forEach(function (sec, i) {
+      var box = $('.sec-head .doodles', sec);
+      if (!box) return;
+      var choca = [];
+      Object.keys(DECO_CHOCA).forEach(function (k) { if (sec.classList.contains(k)) choca = DECO_CHOCA[k]; });
+      var usadas = {};
+      box.innerHTML = DECO_SLOTS.map(function (s, j) {
+        var ops = decos.filter(function (d) { return d.forma === s.forma && choca.indexOf(d.color) < 0 && !usadas[d.archivo]; });
+        if (!ops.length) return '';
+        var d = ops[(i + j) % ops.length];
+        usadas[d.archivo] = 1;
+        return '<img class="doodle" src="' + esc(d.archivo) + '" alt="" loading="lazy" decoding="async" style="' + s.css + ';width:' + s.w + 'px">';
+      }).join('');
+    });
   }
 
   /** Encabezado de sección: eyebrow + título con palabra script + subtítulo. */
@@ -1021,6 +1045,7 @@
     renderFaq();
     renderCierre();
     renderPlaylist();
+    decorarTitulos();
 
     wireMedia(document);
     setupMenu();

@@ -48,6 +48,45 @@
     return '<svg class="' + (cls || 'ic') + '" aria-hidden="true"><use href="#ic-' + name + '"/></svg>';
   }
 
+  /** '07:00' → { t: '7:00', suf: 'a. m.' }. '00:00' es medianoche (12:00 a. m.). */
+  function hora12(hhmm) {
+    var p = String(hhmm).split(':'), h = parseInt(p[0], 10);
+    return { t: (h % 12 || 12) + ':' + p[1], suf: h < 12 ? 'a. m.' : 'p. m.' };
+  }
+
+  /**
+   * Rango en formato colombiano de 12 h: '7:00 – 8:00 a. m.', '11:10 a. m. – 12:20 p. m.'.
+   * Si ambas horas comparten a. m./p. m., el sufijo va una sola vez al final.
+   * Usa espacios duros para que solo se parta la línea junto al guion.
+   */
+  function formatHora(inicio, fin) {
+    var nb = function (s) { return s.replace(/ /g, ' '); };
+    var a = hora12(inicio);
+    if (!fin) return nb(a.t + ' ' + a.suf);
+    var b = hora12(fin);
+    return (a.suf === b.suf ? a.t : nb(a.t + ' ' + a.suf)) + ' – ' + nb(b.t + ' ' + b.suf);
+  }
+
+  /** Campo que puede venir como texto o como { texto, porConfirmar }. */
+  function campo(v) {
+    if (v == null || v === '') return null;
+    return typeof v === 'object' ? { texto: v.texto, pc: !!v.porConfirmar } : { texto: String(v), pc: false };
+  }
+
+  /** Imagen de logo dentro de su recuadro; si el archivo falta, queda el recuadro "LOGO". */
+  function ponerLogo(box, src, alt, w, h) {
+    if (!box) return;
+    var img = new Image();
+    img.onload = function () { box.innerHTML = ''; box.appendChild(img); };
+    img.alt = alt;
+    if (w) { img.width = w; img.height = h; }
+    img.decoding = 'async';
+    img.src = src;
+  }
+
+  // Medidas reales de los archivos del logo (evitan saltos de layout).
+  var LOGO_W = 1206, LOGO_H = 589, LEMA_W = 1206, LEMA_H = 328;
+
   /** Recuadro de imagen: si el archivo no existe, muestra su nombre. */
   function media(src, opts) {
     opts = opts || {};
@@ -162,10 +201,7 @@
 
     // marca + lema
     $('.brand__lema').textContent = C.meta.lema;
-    var logoBox = $('[data-logo]');
-    var img = new Image();
-    img.onload = function () { logoBox.innerHTML = ''; logoBox.appendChild(img); img.alt = 'CONAL 2026'; };
-    img.src = C.meta.logo;
+    ponerLogo($('[data-logo]'), C.meta.logo, C.meta.logoAlt, LOGO_W, LOGO_H);
 
     // barra inferior
     $('[data-tabbar]').innerHTML =
@@ -207,8 +243,10 @@
     $('[data-hero-bg]').innerHTML = media(h.foto, { ar: 'auto', color: 'morado', eager: true, alt: '' });
 
     $('[data-hero]').innerHTML =
-      '<div class="hero__logo ph-logo" data-hero-logo></div>' +
-      '<p class="hero__lema">' + esc(m.lema) + '</p>' +
+      '<div class="hero__marca">' +
+        '<div class="hero__logo ph-logo" data-hero-logo></div>' +
+        '<div class="hero__lemaimg" data-hero-lema><p class="hero__lema">' + esc(m.lema) + '</p></div>' +
+      '</div>' +
       '<p class="hero__fechas">' + esc(m.fechas) + '</p>' +
       '<div class="cd" data-cd>' +
         '<p class="cd__label">' + esc(h.cuentaRegresivaTitulo) + '</p>' +
@@ -217,7 +255,7 @@
             return '<div class="cd__item"><span class="cd__n" data-cd-' + k + '>--</span><span class="cd__l">' + esc(C.ui[k]) + '</span></div>';
           }).join('') +
         '</div>' +
-        (m.inicioEsProvisional ? '<p class="cd__nota">' + esc(h.cuentaRegresivaNota) + '</p>' : '') +
+        (h.cuentaRegresivaNota ? '<p class="cd__nota">' + esc(h.cuentaRegresivaNota) + '</p>' : '') +
       '</div>' +
       '<p class="hero__eyebrow">' + ph(h.eyebrow) + '</p>' +
       '<h1 class="hero__title">' + ph(h.tituloLinea1) + '<span class="script">' + ph(h.tituloScript) + '</span></h1>' +
@@ -228,10 +266,9 @@
       '</div>' +
       '<a class="scrolldown" href="#acceso">' + esc(h.desliza) + icon('arrow-down') + '</a>';
 
-    var box = $('[data-hero-logo]');
-    var img = new Image();
-    img.onload = function () { box.innerHTML = ''; box.appendChild(img); img.alt = 'CONAL 2026 · ' + C.meta.subtitulo; };
-    img.src = C.meta.logo;
+    ponerLogo($('[data-hero-logo]'), C.meta.logo, C.meta.logoAlt, LOGO_W, LOGO_H);
+    // El lema en imagen reemplaza al texto solo si el archivo existe.
+    if (m.lemaImg) ponerLogo($('[data-hero-lema]'), m.lemaImg, m.lema, LEMA_W, LEMA_H);
 
     countdown();
   }
@@ -281,9 +318,10 @@
     var dias = '<div class="daycards">' + a.dias.map(function (d, i) {
       var c = ['fucsia', 'morado', 'amarillo'][i] || 'fucsia';
       return '<a class="daycard reveal" href="#cronograma" data-goday="' + esc(d.dia) + '" style="--c:var(--' + c + ')">' +
-        '<span class="daycard__tag">' + esc(d.etiqueta) + '</span>' +
-        '<span class="daycard__sede">' + ph(d.sede) + '</span>' +
-        '<span class="daycard__tipo">' + ph(d.tipo) + '</span></a>';
+        '<span class="daycard__top"><span class="daycard__tag">' + esc(d.etiqueta) + '</span>' +
+        '<span class="daycard__fecha">' + ph(d.fecha) + '</span></span>' +
+        '<span class="daycard__sede">' + ph(d.titulo) + '</span>' +
+        '<span class="daycard__tipo">' + ph(d.descripcion) + '</span></a>';
     }).join('') + '</div>';
 
     var foto = '<div class="bigphoto reveal">' +
@@ -307,11 +345,14 @@
 
     var panels = cr.dias.map(function (d, i) {
       var items = d.items.map(function (it) {
-        return '<li class="tline__item">' +
-          '<span class="tline__hora">' + ph(it.hora) + '</span>' +
-          '<div class="tline__body">' +
-            '<p class="tline__act">' + ph(it.actividad) + '</p>' +
-            '<p class="tline__lugar">' + icon('pin') + ph(it.lugar) + '</p>' +
+        var peso = TIPO_PESO[it.tipo] || 'medio';
+        return '<li class="tl tl--' + peso + '" data-tipo="' + esc(it.tipo) + '"' +
+          ' data-ini="' + esc(d.fechaISO + 'T' + it.inicio) + '" data-fin="' + esc(it.fin) + '">' +
+          '<span class="tl__hora">' + esc(formatHora(it.inicio, it.fin)) + '</span>' +
+          '<span class="tl__ico">' + icon(TIPO_ICONO[it.tipo] || 'calendar') + '</span>' +
+          '<div class="tl__body">' +
+            '<p class="tl__act">' + ph(it.actividad) + '</p>' +
+            (it.detalle ? '<p class="tl__det">' + ph(it.detalle) + '</p>' : '') +
           '</div></li>';
       }).join('');
 
@@ -319,16 +360,79 @@
         (i === 0 ? '' : ' hidden') + ' style="--c:var(--' + d.color + ')">' +
         '<div class="daybar" data-c="' + d.color + '" style="--c:var(--' + d.color + ')">' +
           '<span class="daybar__fecha">' + ph(d.fecha) + '</span>' +
-          '<span class="daybar__titulo">' + ph(d.titulo) + '</span>' +
-          '<span class="daybar__sede">' + icon('pin') + ph(d.sede) + '</span>' +
+          '<span class="daybar__titulo">' + esc(d.tab) + ' · ' + ph(d.nombre) + '</span>' +
+          '<span class="daybar__desc">' + ph(d.descripcion) + '</span>' +
         '</div>' +
-        '<ul class="tline">' + items + '</ul></div>';
+        '<ol class="tline">' + items + '</ol></div>';
     }).join('');
+
+    var leyenda = '<ul class="tl-ley" aria-label="Tipos de actividad">' + Object.keys(cr.tipos).map(function (k) {
+      return '<li class="tl-ley__item tl-ley__item--' + (TIPO_PESO[k] || 'medio') + '">' +
+        icon(TIPO_ICONO[k] || 'calendar') + esc(cr.tipos[k]) + '</li>';
+    }).join('') + '</ul>';
 
     $('[data-head="cronograma"]').innerHTML = head(cr);
     $('[data-render="cronograma"]').innerHTML =
       '<div class="crono__foto reveal">' + media(cr.foto, { color: 'azul', alt: 'Cronograma CONAL 2026' }) + '</div>' +
-      tabs + '<div class="reveal">' + panels + '</div>';
+      tabs + '<div class="reveal">' + leyenda + panels + '</div>';
+  }
+
+  // Ícono y peso visual de cada tipo de actividad del cronograma.
+  var TIPO_ICONO = {
+    acreditacion: 'badge', academico: 'bulb', ceremonia: 'star', comida: 'food',
+    mercadeo: 'megaphone', traslado: 'bus', logistica: 'bed', integracion: 'party'
+  };
+  var TIPO_PESO = {
+    academico: 'fuerte', ceremonia: 'fuerte', acreditacion: 'liviano'
+  };
+
+  /**
+   * "Ahora" y "Sigue": solo durante los días del evento (hora de Colombia).
+   * Fuera de esas fechas no marca nada.
+   */
+  function setupAhora() {
+    var cr = C.cronograma;
+    var filas = $$('#cronograma .tl');
+    if (!filas.length) return;
+
+    var t = filas.map(function (li) {
+      var ini = Date.parse(li.dataset.ini + ':00-05:00');
+      var fin = Date.parse(li.dataset.ini.slice(0, 11) + li.dataset.fin + ':00-05:00');
+      if (fin <= ini) fin += 86400000;   // termina a medianoche
+      return { li: li, ini: ini, fin: fin };
+    });
+    var dias = cr.dias.map(function (d) { return d.fechaISO; });
+
+    function hoyBogota() {
+      return new Date(Date.now() - 5 * 3600000).toISOString().slice(0, 10);
+    }
+
+    function marcar() {
+      $$('.tl__badge').forEach(function (b) { b.remove(); });
+      filas.forEach(function (li) { li.classList.remove('is-ahora', 'is-sigue'); });
+      var hoy = hoyBogota();
+      if (dias.indexOf(hoy) < 0) return false;
+
+      var ahora = Date.now(), actual = null, sigue = null;
+      t.forEach(function (x) {
+        if (x.ini <= ahora && ahora < x.fin) actual = x;
+        else if (x.ini > ahora && !sigue) sigue = x;
+      });
+      [[actual, 'is-ahora', cr.etiquetaAhora], [sigue, 'is-sigue', cr.etiquetaSigue]].forEach(function (m) {
+        if (!m[0]) return;
+        m[0].li.classList.add(m[1]);
+        $('.tl__body', m[0].li).insertAdjacentHTML('afterbegin', '<span class="tl__badge">' + esc(m[2]) + '</span>');
+      });
+      return true;
+    }
+
+    if (marcar()) {
+      // Durante el evento, abre la pestaña del día de hoy.
+      var bar = $('#cronograma .tabs');
+      var i = dias.indexOf(hoyBogota());
+      if (bar && bar._activar && i >= 0) bar._activar(i);
+    }
+    setInterval(marcar, 60000);
   }
 
   /* ═══════════════════════════ 3 · SEDES ═══════════════════════════ */
@@ -362,45 +466,138 @@
   /* ═══════════════════════════ 4 · PLANES ═══════════════════════════ */
 
   function renderPlanes() {
-    var p = C.planes, b = p.banner;
+    var p = C.planes;
+    var tagPC = '<span class="pc">' + esc(p.etiquetaPorConfirmar) + '</span>';
 
-    var banner = '<div class="banner reveal">' +
-      '<span class="banner__tag">' + esc(b.etiqueta) + '</span>' +
-      '<h3>' + ph(b.titulo) + '</h3>' +
-      '<p>' + ph(b.texto) + '</p>' +
-      '<div class="banner__meta">' +
-        '<span>' + icon('calendar') + ph(b.fecha) + '</span>' +
-        '<span>' + icon('ticket') + ph(b.precio) + '</span>' +
-      '</div>' +
-      '<a class="btn" href="' + esc(b.enlace) + '">' + esc(b.boton) + icon('arrow') + '</a></div>';
+    /** Texto de un campo + etiqueta ámbar si está por confirmar. */
+    function valorTxt(v) {
+      var f = campo(v);
+      if (!f) return '';
+      if (f.pc && /^por confirmar$/i.test(f.texto)) return tagPC;
+      return ph(f.texto) + (f.pc ? ' ' + tagPC : '');
+    }
 
-    var tabs = '<div class="tabs" role="tablist" aria-label="Tipos de plan">' + p.pestanas.map(function (t, i) {
-      return '<button class="tab" type="button" role="tab" id="tab-' + t.id + '" aria-controls="panel-' + t.id + '"' +
-        ' aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '" style="--c:var(--amarillo)" data-c="amarillo">' +
-        esc(t.tab) + '</button>';
+    function chips(it) {
+      return '<div class="pchips">' +
+        '<span class="pchip">' + icon('clock') + esc(it.cuando) + '</span>' +
+        '<span class="pchip pchip--valor' + (it.gratis ? ' pchip--gratis' : '') + '">' + icon('ticket') +
+          '<span>' + valorTxt(it.valor) + '</span></span>' +
+        (it.cupos ? '<span class="pchip">' + icon('users') + esc(p.etiquetaCupos) + ': ' + esc(it.cupos) + '</span>' : '') +
+      '</div>';
+    }
+
+    function detalles(it, excluir) {
+      return Object.keys(p.campos).filter(function (k) {
+        return campo(it[k]) && (!excluir || excluir.indexOf(k) < 0);
+      }).map(function (k) {
+        return '<div class="pdet"><dt>' + esc(p.campos[k]) + '</dt><dd>' + valorTxt(it[k]) + '</dd></div>';
+      }).join('');
+    }
+
+    function accion(it, cls) {
+      if (it.inscripcion) {
+        return '<a class="btn ' + (cls || '') + '" href="' + esc(it.inscripcion) + '" target="_blank" rel="noopener noreferrer">' +
+          esc(p.botonInscripcion) + icon('arrow') + '<span class="sr"> (abre en una pestaña nueva)</span></a>';
+      }
+      return '<a class="btn ' + (cls || '') + '" href="#planes-reservas">' +
+        esc(it.botonSinInscripcion || p.reservas.titulo) + icon('arrow-down') + '</a>';
+    }
+
+    // Banner del plan destacado (pre-evento): todo visible, sin desplegable.
+    var dest = p.lista.filter(function (it) { return it.destacado; })[0];
+    var banner = dest ? '<article class="banner reveal" id="plan-' + esc(dest.id) + '" data-fecha="' + esc(dest.fecha) + '">' +
+      '<span class="banner__tag">' + esc(p.etiquetaDestacado) + ' · ' + esc(dest.fechaLarga) + '</span>' +
+      '<h3>' + ph(dest.nombre) + '</h3>' +
+      '<p>' + ph(dest.descripcion) + '</p>' +
+      chips(dest) +
+      '<dl class="pdets pdets--banner">' + detalles(dest) + '</dl>' +
+      accion(dest) + '</article>' : '';
+
+    var resumen = '<div class="presumen reveal"><h3 class="presumen__t">' + esc(p.resumenTitulo) + '</h3><ol>' +
+      p.lista.map(function (it) {
+        return '<li data-fecha="' + esc(it.fecha) + '"><a class="presumen__fila" href="#plan-' + esc(it.id) + '" data-plan-ir="' + esc(it.id) + '">' +
+          '<span class="presumen__fecha">' + esc(it.fechaCorta) + '</span>' +
+          '<span class="presumen__nombre">' + ph(it.nombre) + '</span>' +
+          '<span class="presumen__hora">' + esc(it.hora) + '</span>' +
+          '<span class="presumen__valor' + (it.gratis ? ' is-gratis' : '') + '">' + valorTxt(it.valorCorto || it.valor) + '</span>' +
+        '</a></li>';
+      }).join('') + '</ol></div>';
+
+    var filtros = '<div class="pfiltros" role="group" aria-label="Filtrar planes por fecha">' + p.filtros.map(function (f, i) {
+      return '<button class="pfiltro" type="button" data-filtro="' + esc(f.fecha) + '" aria-pressed="' + (i === 0) + '">' + esc(f.label) + '</button>';
     }).join('') + '</div>';
 
-    var panels = p.pestanas.map(function (t, i) {
-      var items = t.items.map(function (it, j) {
-        var c = ['fucsia', 'morado', 'azul', 'naranja', 'verde'][j % 5];
-        return '<article class="plan" style="--c:var(--' + c + ')">' +
-          '<h4>' + ph(it.nombre) + '</h4>' +
-          '<div class="plan__meta">' +
-            '<span>' + icon('pin') + ph(it.lugar) + '</span>' +
-            '<span>' + icon('clock') + ph(it.cuando) + '</span>' +
-          '</div>' +
-          '<div class="plan__pie">' +
-            '<span class="plan__precio" style="color:var(--' + c + ')">' + ph(it.precio) + '</span>' +
-            '<a class="btn btn--sm" style="--bg:var(--' + c + ');--fg:#fff" href="' + esc(it.enlace) + '">' + esc(p.botonInscripcion) + '</a>' +
-          '</div></article>';
-      }).join('');
-      return '<div class="tabpanel" id="panel-' + t.id + '" role="tabpanel" aria-labelledby="tab-' + t.id + '"' +
-        (i === 0 ? '' : ' hidden') + '><div class="plans">' + items + '</div></div>';
-    }).join('');
+    var cards = '<div class="plans">' + p.lista.filter(function (it) { return !it.destacado; }).map(function (it, j) {
+      var c = ['fucsia', 'morado', 'azul', 'orquidea'][j % 4];
+      var idDet = 'plan-det-' + it.id;
+      return '<article class="plan" id="plan-' + esc(it.id) + '" data-fecha="' + esc(it.fecha) + '" style="--c:var(--' + c + ')">' +
+        '<span class="plan__fecha">' + esc(it.fechaLarga) + '</span>' +
+        '<h4>' + ph(it.nombre) + '</h4>' +
+        chips(it) +
+        '<p class="plan__desc">' + ph(it.descripcion) + '</p>' +
+        '<div class="plan__det" id="' + idDet + '"><div><dl class="pdets">' + detalles(it) + '</dl></div></div>' +
+        '<div class="plan__pie">' +
+          '<button class="plan__mas" type="button" aria-expanded="false" aria-controls="' + idDet + '"' +
+            ' data-mas="' + esc(p.botonDetalles) + '" data-menos="' + esc(p.botonOcultar) + '">' +
+            '<span>' + esc(p.botonDetalles) + '</span>' + icon('chevron') + '</button>' +
+          accion(it, 'btn--sm') +
+        '</div></article>';
+    }).join('') + '</div>';
+
+    var cond = '<div class="acc pcond reveal"><div class="acc__item">' +
+      '<button class="acc__q" type="button" aria-expanded="false" aria-controls="planes-cond">' +
+        '<span>' + esc(p.condiciones.titulo) + '</span><span class="acc__sign">' + icon('chevron') + '</span></button>' +
+      '<div class="acc__a" id="planes-cond"><div><ul class="pcond__list">' + p.condiciones.items.map(function (x) {
+        return '<li>' + icon('check') + '<span>' + ph(x) + '</span></li>';
+      }).join('') + '</ul></div></div></div></div>';
+
+    var reservas = '<div class="preservas reveal" id="planes-reservas"><h3>' + esc(p.reservas.titulo) + '</h3><ul>' +
+      p.reservas.items.map(function (r) {
+        var ext = /^https?:/.test(r.enlace) ? ' target="_blank" rel="noopener noreferrer"' : '';
+        return '<li><a class="preserva" href="' + esc(r.enlace) + '"' + ext + '>' +
+          '<span class="preserva__ico">' + icon(r.icono) + '</span>' +
+          '<span class="preserva__txt"><span class="preserva__et">' + esc(r.etiqueta) + '</span>' +
+          (r.nombre ? '<span class="preserva__nombre">' + esc(r.nombre) + '</span>' : '') +
+          '<span class="preserva__val">' + esc(r.valor) + '</span></span></a></li>';
+      }).join('') + '</ul></div>';
 
     $('[data-head="planes"]').innerHTML = head(p);
-    $('[data-render="planes"]').innerHTML = banner + tabs + '<div class="reveal">' + panels + '</div>' +
-      '<p class="nota-pie">' + ph(p.nota) + '</p>';
+    $('[data-render="planes"]').innerHTML = filtros + resumen + banner + '<div class="reveal">' + cards + '</div>' +
+      cond + reservas + '<p class="nota-pie">' + ph(p.nota) + '</p>';
+
+    var root = $('#planes');
+
+    // Filtros por fecha
+    var botones = $$('[data-filtro]', root);
+    function filtrar(fecha) {
+      botones.forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.filtro === fecha ? 'true' : 'false'); });
+      $$('[data-fecha]', root).forEach(function (el) { el.hidden = !!fecha && el.dataset.fecha !== fecha; });
+    }
+    botones.forEach(function (b) { b.addEventListener('click', function () { filtrar(b.dataset.filtro); }); });
+
+    // Resumen → tarjeta (si el filtro la esconde, vuelve a "Todos")
+    $$('[data-plan-ir]', root).forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        var card = document.getElementById('plan-' + a.dataset.planIr);
+        if (!card) return;
+        e.preventDefault();
+        if (card.hidden) filtrar('');
+        card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        card.classList.remove('is-flash');
+        void card.offsetWidth;
+        card.classList.add('is-flash');
+      });
+    });
+
+    // Ver detalles
+    $$('.plan__mas', root).forEach(function (b) {
+      b.addEventListener('click', function () {
+        var abierto = b.getAttribute('aria-expanded') === 'true';
+        b.setAttribute('aria-expanded', abierto ? 'false' : 'true');
+        $('span', b).textContent = abierto ? b.dataset.mas : b.dataset.menos;
+        b.closest('.plan').classList.toggle('is-open', !abierto);
+      });
+    });
   }
 
   /* ═══════════════════════════ 5 · TRANSPORTE ═══════════════════════════ */
@@ -625,7 +822,10 @@
     $('[data-render="faq"]').innerHTML = '<div class="faq">' +
       '<div class="faq__foto reveal">' + media(f.foto, { ar: '4/3', color: 'fucsia', alt: 'Preguntas frecuentes' }) + '</div>' +
       '<div class="reveal">' + acc + '</div></div>';
+  }
 
+  /** Acordeones (FAQ y condiciones de los planes). */
+  function setupAcordeones() {
     $$('.acc__q').forEach(function (q) {
       q.addEventListener('click', function () {
         var abierto = q.getAttribute('aria-expanded') === 'true';
@@ -658,12 +858,8 @@
       '<a class="pie__ig" href="' + esc(p.instagram) + '" target="_blank" rel="noopener">' + icon('instagram') + esc(p.instagramLabel) + '</a>' +
       '<p class="pie__credito">' + esc(p.credito) + '</p></div>';
 
-    [['[data-pie-logo]', C.meta.logo, 'CONAL 2026'], ['[data-pie-aneiap]', C.meta.logoAneiap, 'ANEIAP']].forEach(function (x) {
-      var box = $(x[0]); if (!box) return;
-      var img = new Image();
-      img.onload = function () { box.innerHTML = ''; img.alt = x[2]; box.appendChild(img); };
-      img.src = x[1];
-    });
+    ponerLogo($('[data-pie-logo]'), C.meta.logo, C.meta.logoAlt, LOGO_W, LOGO_H);
+    ponerLogo($('[data-pie-aneiap]'), C.meta.logoAneiap, 'ANEIAP');
   }
 
   /* ═══════════════════════════ PLAYLIST ═══════════════════════════ */
@@ -829,6 +1025,8 @@
     wireMedia(document);
     setupMenu();
     setupTabs();
+    setupAcordeones();
+    setupAhora();
     setupScroll();
     renderBienvenida();
 

@@ -33,9 +33,8 @@ window.CONTENT = {
     fechas: '21 · 22 · 23 de noviembre de 2026',
 
     // Fecha y hora de inicio para la cuenta regresiva (zona horaria de Colombia, -05:00).
-    // [PLACEHOLDER] la hora exacta de apertura está por confirmar.
-    inicio: '2026-11-21T08:00:00-05:00',
-    inicioEsProvisional: true,
+    // Es la apertura de la acreditación del Día 1.
+    inicio: '2026-11-21T07:00:00-05:00',
 
     // Archivo del PDF. Si no existe, el botón muestra un aviso amable.
     pdf: './assets/guia-conal-2026.pdf',
@@ -45,7 +44,10 @@ window.CONTENT = {
     whatsapp: '573000000000',
     whatsappMensaje: 'Hola, comité CONAL 2026. Tengo una pregunta sobre el evento.',
 
-    logo: './assets/logos/logo-conal.png',
+    logo: './assets/logos/logo-conal.jpeg',
+    logoAlt: 'CONAL 2026 · El camino del silletero · Medellín',
+    // Imagen del lema "Sembrando ideas, cosechando impacto" (va debajo del logo en el inicio).
+    lemaImg: './assets/logos/texto-conal.jpeg',
     logoAneiap: './assets/logos/logo-aneiap.png',
     sello: './assets/logos/sello-conal.png'
   },
@@ -91,7 +93,7 @@ window.CONTENT = {
     botonSecundario: 'Descargar PDF',
     desliza: 'Desliza',
     cuentaRegresivaTitulo: 'Faltan',
-    cuentaRegresivaNota: 'Hora de inicio provisional, sujeta a confirmación.',
+    cuentaRegresivaNota: 'Para la apertura de la acreditación · sábado 21 de noviembre, 7:00 a. m.',
     cuentaRegresivaFin: '¡Llegó el día! Nos vemos en Medellín.'
   },
 
@@ -109,20 +111,23 @@ window.CONTENT = {
       {
         etiqueta: 'D1',
         dia: 'dia-1',
-        sede: '[PLACEHOLDER] Sede principal · Medellín',
-        tipo: '[PLACEHOLDER] Actividad académica'
+        titulo: 'Día 1 · Saber',
+        fecha: 'Sáb 21 nov',
+        descripcion: 'Contenido académico, ODS y responsabilidad social y ambiental.'
       },
       {
         etiqueta: 'D2',
         dia: 'dia-2',
-        sede: '[PLACEHOLDER] Finca / Sede campestre',
-        tipo: '[PLACEHOLDER] Actividad académica e integración'
+        titulo: 'Día 2 · Ser',
+        fecha: 'Dom 22 nov',
+        descripcion: 'Desarrollo personal del asociado y capacitación interna.'
       },
       {
         etiqueta: 'D3',
         dia: 'dia-3',
-        sede: '[PLACEHOLDER] Finca / Sede campestre',
-        tipo: '[PLACEHOLDER] Cierre y regreso a Medellín'
+        titulo: 'Día 3 · Hacer',
+        fecha: 'Lun 23 nov',
+        descripcion: 'Integración de los asistentes.'
       }
     ],
 
@@ -142,54 +147,100 @@ window.CONTENT = {
     subtitulo: 'Horarios sujetos a ajustes del comité organizador.',
     foto: './assets/fotos/cronograma.jpg',
 
+    // Nombre y orden de los tipos de actividad (para la leyenda).
+    // tipo: acreditacion · academico · ceremonia · comida · mercadeo · traslado · logistica · integracion
+    tipos: {
+      academico:    'Académico',
+      ceremonia:    'Ceremonia',
+      comida:       'Comida',
+      integracion:  'Integración',
+      traslado:     'Traslado',
+      logistica:    'Logística',
+      mercadeo:     'Mercadeo',
+      acreditacion: 'Acreditación'
+    },
+    etiquetaAhora: 'Ahora',
+    etiquetaSigue: 'Sigue',
+
+    // Horas en formato 24 h ('HH:MM'). La página las muestra en 12 h.
+    // Una fila que termina en '00:00' termina a medianoche de ese mismo día.
+    // "detalle" es opcional: aparece como línea secundaria debajo de la actividad.
     dias: [
       {
         id: 'dia-1',
         tab: 'Día 1',
         color: 'fucsia',
-        fecha: 'Sábado 21 de noviembre',
-        titulo: '[PLACEHOLDER] Apertura y jornada académica',
-        sede: '[PLACEHOLDER] Sede principal · Medellín',
+        nombre: 'Saber',
+        fecha: 'Sábado 21 de noviembre de 2026',
+        fechaISO: '2026-11-21',
+        descripcion: 'Contenido académico, ODS y responsabilidad social y ambiental.',
         items: [
-          { hora: '[PLACEHOLDER] 00:00 a. m.', actividad: '[PLACEHOLDER] Registro y entrega de escarapelas', lugar: '[PLACEHOLDER] Punto de registro' },
-          { hora: '[PLACEHOLDER] 00:00 a. m.', actividad: '[PLACEHOLDER] Acto de apertura CONAL 2026',       lugar: '[PLACEHOLDER] Auditorio principal' },
-          { hora: '[PLACEHOLDER] 00:00 a. m.', actividad: '[PLACEHOLDER] Primera ponencia',                   lugar: '[PLACEHOLDER] Auditorio principal' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Almuerzo',                           lugar: '[PLACEHOLDER] Zona de alimentación' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Talleres simultáneos',               lugar: '[PLACEHOLDER] Salones asignados' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Traslado al alojamiento',            lugar: '[PLACEHOLDER] Punto de encuentro' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Noche de bienvenida',                lugar: '[PLACEHOLDER] Por confirmar' }
+          { inicio: '07:00', fin: '08:00', actividad: 'Acreditación', tipo: 'acreditacion' },
+          { inicio: '08:00', fin: '08:30', actividad: 'Palabras de bienvenida', tipo: 'ceremonia' },
+          { inicio: '08:30', fin: '09:00', actividad: 'Acto de apertura cultural', tipo: 'ceremonia' },
+          { inicio: '09:00', fin: '10:10', actividad: 'Taller 1 - Data sprint: Decisiones que transforman', tipo: 'academico' },
+          { inicio: '10:10', fin: '10:40', actividad: 'Refrigerio 1', tipo: 'comida' },
+          { inicio: '10:40', fin: '11:10', actividad: 'Acreditación', tipo: 'acreditacion' },
+          { inicio: '11:10', fin: '12:20', actividad: 'Simulación inmersiva 1 - ¿Qué harías si fueras el gerente?', tipo: 'academico' },
+          { inicio: '12:20', fin: '13:50', actividad: 'Almuerzo 1 - Libre', tipo: 'comida' },
+          { inicio: '13:50', fin: '14:20', actividad: 'Acreditación', tipo: 'acreditacion' },
+          { inicio: '14:20', fin: '14:50', actividad: 'Espacio para mercadeo', tipo: 'mercadeo' },
+          { inicio: '14:50', fin: '16:20', actividad: 'Panel 1 - Ingeniería para transformar territorios', tipo: 'academico' },
+          { inicio: '16:20', fin: '17:10', actividad: 'Espacio para mercadeo', tipo: 'mercadeo' },
+          { inicio: '17:10', fin: '17:40', actividad: 'Acomodación en transporte y Refrigerio 2', tipo: 'traslado' },
+          { inicio: '17:40', fin: '19:30', actividad: 'Traslado al hotel', tipo: 'traslado', detalle: 'Trayecto aproximado de 1 h 30 min a 2 h. Lugar por confirmar.' },
+          { inicio: '19:30', fin: '20:00', actividad: 'Acomodación en habitaciones', tipo: 'logistica' },
+          { inicio: '20:00', fin: '21:00', actividad: 'Cena 1', tipo: 'comida' },
+          { inicio: '21:00', fin: '22:00', actividad: 'Preparación para la integración', tipo: 'integracion' },
+          { inicio: '22:00', fin: '00:00', actividad: 'Integración nocturna', tipo: 'integracion' }
         ]
       },
       {
         id: 'dia-2',
         tab: 'Día 2',
         color: 'morado',
-        fecha: 'Domingo 22 de noviembre',
-        titulo: '[PLACEHOLDER] Jornada académica e integración',
-        sede: '[PLACEHOLDER] Finca / Sede campestre',
+        nombre: 'Ser',
+        fecha: 'Domingo 22 de noviembre de 2026',
+        fechaISO: '2026-11-22',
+        descripcion: 'Desarrollo personal del asociado y capacitación interna.',
         items: [
-          { hora: '[PLACEHOLDER] 00:00 a. m.', actividad: '[PLACEHOLDER] Desayuno',                        lugar: '[PLACEHOLDER] Zona de alimentación' },
-          { hora: '[PLACEHOLDER] 00:00 a. m.', actividad: '[PLACEHOLDER] Salida hacia la sede campestre',  lugar: '[PLACEHOLDER] Punto de encuentro' },
-          { hora: '[PLACEHOLDER] 00:00 a. m.', actividad: '[PLACEHOLDER] Segunda ponencia',                lugar: '[PLACEHOLDER] Salón principal' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Almuerzo',                        lugar: '[PLACEHOLDER] Zona de alimentación' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Actividades de integración',      lugar: '[PLACEHOLDER] Zonas verdes' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Cena',                            lugar: '[PLACEHOLDER] Zona de alimentación' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Fiesta temática',                 lugar: '[PLACEHOLDER] Por confirmar' }
+          { inicio: '07:00', fin: '09:00', actividad: 'Desayuno 1', tipo: 'comida' },
+          { inicio: '09:00', fin: '09:30', actividad: 'Acreditación', tipo: 'acreditacion' },
+          { inicio: '09:30', fin: '10:30', actividad: 'Workshop 1 - El reto de explicar lo complejo', tipo: 'academico' },
+          { inicio: '10:30', fin: '11:00', actividad: 'Refrigerio 3', tipo: 'comida' },
+          { inicio: '11:00', fin: '11:30', actividad: 'Acreditación', tipo: 'acreditacion' },
+          { inicio: '11:30', fin: '13:00', actividad: 'Espacio JDN-IN-GNP', tipo: 'academico' },
+          { inicio: '13:00', fin: '14:00', actividad: 'Almuerzo 2', tipo: 'comida' },
+          { inicio: '14:00', fin: '14:30', actividad: 'Acreditación', tipo: 'acreditacion' },
+          { inicio: '14:30', fin: '16:00', actividad: 'Taller 2 - Alto rendimiento sin agotamiento', tipo: 'academico' },
+          { inicio: '16:00', fin: '17:00', actividad: 'Conversatorio 1 - El talento que liderará la industria 4.0', tipo: 'academico' },
+          { inicio: '17:00', fin: '17:30', actividad: 'Refrigerio 4', tipo: 'comida' },
+          { inicio: '17:30', fin: '19:30', actividad: 'Preparación para la gala', tipo: 'integracion' },
+          { inicio: '19:30', fin: '20:00', actividad: 'Acreditación', tipo: 'acreditacion' },
+          { inicio: '20:00', fin: '21:00', actividad: 'Cena 2', tipo: 'comida' },
+          { inicio: '21:00', fin: '23:00', actividad: 'Gala y cumpleaños de ANEIAP', tipo: 'ceremonia' },
+          { inicio: '23:00', fin: '00:00', actividad: 'Integración nocturna', tipo: 'integracion' }
         ]
       },
       {
         id: 'dia-3',
         tab: 'Día 3',
         color: 'amarillo',
-        fecha: 'Lunes 23 de noviembre',
-        titulo: '[PLACEHOLDER] Cierre y regreso',
-        sede: '[PLACEHOLDER] Finca / Sede campestre',
+        nombre: 'Hacer',
+        fecha: 'Lunes 23 de noviembre de 2026',
+        fechaISO: '2026-11-23',
+        descripcion: 'Integración de los asistentes.',
         items: [
-          { hora: '[PLACEHOLDER] 00:00 a. m.', actividad: '[PLACEHOLDER] Desayuno',                     lugar: '[PLACEHOLDER] Zona de alimentación' },
-          { hora: '[PLACEHOLDER] 00:00 a. m.', actividad: '[PLACEHOLDER] Panel de cierre',              lugar: '[PLACEHOLDER] Salón principal' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Almuerzo de despedida',        lugar: '[PLACEHOLDER] Zona de alimentación' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Acto de clausura',             lugar: '[PLACEHOLDER] Salón principal' },
-          { hora: '[PLACEHOLDER] 00:00 p. m.', actividad: '[PLACEHOLDER] Regreso a Medellín',           lugar: '[PLACEHOLDER] Punto de encuentro' }
+          { inicio: '07:00', fin: '09:00', actividad: 'Desayuno 2', tipo: 'comida' },
+          { inicio: '09:00', fin: '09:30', actividad: 'Acreditación', tipo: 'acreditacion' },
+          { inicio: '09:30', fin: '12:00', actividad: 'FRAN', tipo: 'integracion' },
+          { inicio: '12:00', fin: '13:00', actividad: 'Almuerzo 3', tipo: 'comida' },
+          { inicio: '13:00', fin: '15:00', actividad: 'Refrigerio 5 y tiempo libre', tipo: 'comida' },
+          { inicio: '15:00', fin: '16:00', actividad: 'Entrega de habitaciones (check out)', tipo: 'logistica' },
+          { inicio: '16:00', fin: '16:30', actividad: 'Acreditación', tipo: 'acreditacion' },
+          { inicio: '16:30', fin: '17:30', actividad: 'Zorro', tipo: 'integracion' },
+          { inicio: '17:30', fin: '18:00', actividad: 'Acomodación en transporte', tipo: 'traslado' },
+          { inicio: '18:00', fin: '20:00', actividad: 'Traslado a Medellín y fin del evento', tipo: 'traslado' }
         ]
       }
     ]
@@ -242,50 +293,198 @@ window.CONTENT = {
     eyebrow: 'Antes y después',
     tituloLinea1: 'Planes',
     tituloScript: 'externos',
-    subtitulo: 'Actividades opcionales con inscripción aparte.',
+    subtitulo: 'Además de la agenda académica del 21 al 23 de noviembre, el comité organiza planes opcionales antes y después del evento para que los asistentes conozcan Medellín y Antioquia. Estos planes no están incluidos en el cupo de inscripción y tienen cupos limitados.',
 
-    banner: {
-      etiqueta: 'Pre-evento',
-      titulo: '[PLACEHOLDER] Plan pre-evento CONAL',
-      texto: '[PLACEHOLDER] Un día antes del CONAL para conocer Medellín con la gente que vas a ver todo el fin de semana.',
-      fecha: '[PLACEHOLDER] Viernes 20 de noviembre · 00:00 a. m.',
-      precio: '[PLACEHOLDER] $00.000',
-      boton: 'Inscríbete',
-      enlace: '#planes'
+    // Chips de filtro. "fecha" debe coincidir con la "fecha" de cada plan.
+    filtros: [
+      { fecha: '',           label: 'Todos' },
+      { fecha: '2026-11-18', label: 'Mié 18 nov' },
+      { fecha: '2026-11-19', label: 'Jue 19 nov' },
+      { fecha: '2026-11-20', label: 'Vie 20 nov' },
+      { fecha: '2026-11-24', label: 'Mar 24 nov' }
+    ],
+
+    resumenTitulo: 'Resumen rápido',
+    botonInscripcion: 'Inscríbete',
+    botonDetalles: 'Ver detalles',
+    botonOcultar: 'Ocultar detalles',
+    etiquetaPorConfirmar: 'Por confirmar',
+    etiquetaCupos: 'Cupos',
+    etiquetaDestacado: 'Pre-evento',
+
+    // Nombre visible de cada campo de detalle, en el orden en que se muestran.
+    campos: {
+      lugar: 'Lugar',
+      comoLlegar: 'Cómo llegar',
+      horario: 'Horario',
+      duracion: 'Duración aprox.',
+      incluye: 'Qué incluye',
+      puntoEncuentro: 'Punto de encuentro',
+      recomendaciones: 'Recomendaciones'
     },
 
-    pestanas: [
+    /* Los 7 planes, en orden cronológico.
+       • Un campo que el plan no trae simplemente se omite (no se muestra).
+       • Un dato pendiente se escribe como { texto: '...', porConfirmar: true }
+         y la página le pone la etiqueta ámbar "Por confirmar".
+       • "gratis: true" pinta el valor con el chip verde.
+       • "destacado: true" lo muestra en el banner grande de la sección.
+       • Sin "inscripcion": en vez de "Inscríbete" sale "Reservas e información". */
+    lista: [
       {
-        id: 'planes-externos',
-        tab: 'Planes externos',
-        items: [
-          { nombre: '[PLACEHOLDER] Recorrido por el centro', lugar: '[PLACEHOLDER] Centro de Medellín',  cuando: '[PLACEHOLDER] Viernes 20 · 00:00 a. m.', precio: '[PLACEHOLDER] $00.000', enlace: '#planes' },
-          { nombre: '[PLACEHOLDER] Tour de Comuna 13',       lugar: '[PLACEHOLDER] Comuna 13',           cuando: '[PLACEHOLDER] Viernes 20 · 00:00 p. m.', precio: '[PLACEHOLDER] $00.000', enlace: '#planes' },
-          { nombre: '[PLACEHOLDER] Paseo en Metrocable',     lugar: '[PLACEHOLDER] Línea por confirmar', cuando: '[PLACEHOLDER] Sábado 21 · 00:00 p. m.',  precio: '[PLACEHOLDER] $00.000', enlace: '#planes' }
-        ]
+        id: 'parque-explora',
+        fecha: '2026-11-18',
+        fechaCorta: 'Mié 18 nov',
+        fechaLarga: 'Miércoles 18 de noviembre',
+        nombre: 'Parque Explora',
+        cuando: 'Mañana · 9:00 a. m.',
+        hora: '9:00 a. m.',
+        descripcion: 'Museo interactivo de ciencia y tecnología con salas de experimentación, el acuario de agua dulce más grande de Suramérica y el vivario. Un plan ideal para ingenieros curiosos.',
+        valor: '$50.000 por persona',
+        valorCorto: '$50.000',
+        cupos: 'Ilimitados',
+        lugar: 'Carrera 52 # 73-75, Medellín (frente a la estación Universidad del Metro)',
+        duracion: '3 a 4 horas',
+        puntoEncuentro: 'Estación Universidad del Metro',
+        recomendaciones: 'Ropa cómoda, documento de identidad y carné estudiantil.',
+        inscripcion: 'https://docs.google.com/forms/d/e/1FAIpQLSfrkjOkNAiaOkTb9vTUusjpnBYJ5w2D40PESvQTq2sFwZlaUQ/viewform'
       },
       {
-        id: 'integraciones',
-        tab: 'Integraciones',
-        items: [
-          { nombre: '[PLACEHOLDER] Noche de bienvenida',  lugar: '[PLACEHOLDER] Por confirmar', cuando: '[PLACEHOLDER] Sábado 21 · 00:00 p. m.',  precio: '[PLACEHOLDER] $00.000', enlace: '#planes' },
-          { nombre: '[PLACEHOLDER] Fiesta temática',      lugar: '[PLACEHOLDER] Sede campestre', cuando: '[PLACEHOLDER] Domingo 22 · 00:00 p. m.', precio: '[PLACEHOLDER] Incluida',  enlace: '#planes' },
-          { nombre: '[PLACEHOLDER] Despedida post-CONAL', lugar: '[PLACEHOLDER] Por confirmar', cuando: '[PLACEHOLDER] Lunes 23 · 00:00 p. m.',   precio: '[PLACEHOLDER] $00.000', enlace: '#planes' }
-        ]
+        id: 'museo-el-castillo',
+        fecha: '2026-11-18',
+        fechaCorta: 'Mié 18 nov',
+        fechaLarga: 'Miércoles 18 de noviembre',
+        nombre: 'Museo El Castillo',
+        cuando: 'Tarde · 1:00 p. m.',
+        hora: '1:00 p. m.',
+        descripcion: 'Castillo de estilo gótico de 1930 en El Poblado, con colecciones de arte decorativo europeo y jardines de inspiración francesa. Uno de los espacios patrimoniales más fotogénicos de la ciudad.',
+        valor: '$27.000 por persona',
+        valorCorto: '$27.000',
+        cupos: '25',
+        lugar: 'Calle 9 Sur # 32-269, El Poblado, Medellín',
+        duracion: '2 horas (recorrido guiado y jardines)',
+        puntoEncuentro: 'Estación Aguacatala del Metro',
+        recomendaciones: 'Llegar 15 minutos antes del recorrido. Lleva algo de efectivo para el transporte. Traer carné estudiantil.',
+        inscripcion: 'https://docs.google.com/forms/d/e/1FAIpQLSfPRqkwAYCwrehZhS_2I6pPXvnQkx2L0KyamRlQFvW81dpSng/viewform'
       },
       {
-        id: 'recomendaciones',
-        tab: 'Recomendaciones',
-        items: [
-          { nombre: '[PLACEHOLDER] Pueblo cercano',          lugar: '[PLACEHOLDER] A 00 min de Medellín', cuando: '[PLACEHOLDER] Cualquier día',  precio: '[PLACEHOLDER] Por tu cuenta', enlace: '#planes' },
-          { nombre: '[PLACEHOLDER] Mirador de la ciudad',    lugar: '[PLACEHOLDER] Por confirmar',        cuando: '[PLACEHOLDER] Tarde o noche',  precio: '[PLACEHOLDER] Entrada libre', enlace: '#planes' },
-          { nombre: '[PLACEHOLDER] Zona gastronómica',       lugar: '[PLACEHOLDER] Por confirmar',        cuando: '[PLACEHOLDER] Noche',          precio: '[PLACEHOLDER] Por tu cuenta', enlace: '#planes' }
-        ]
+        id: 'tour-comuna-13',
+        fecha: '2026-11-19',
+        fechaCorta: 'Jue 19 nov',
+        fechaLarga: 'Jueves 19 de noviembre',
+        nombre: 'Tour Comuna 13',
+        cuando: 'Mañana · 10:00 a. m.',
+        hora: '10:00 a. m.',
+        descripcion: 'Recorrido guiado por la Comuna 13, símbolo de transformación social de Medellín: grafitis, escaleras eléctricas al aire libre, hip hop y relatos de la comunidad.',
+        valor: 'Gratis (se sugiere propina voluntaria para el guía local)',
+        valorCorto: 'Gratis',
+        gratis: true,
+        cupos: 'Ilimitados',
+        comoLlegar: 'Metro línea B hasta la estación San Javier',
+        duracion: '2 a 3 horas',
+        puntoEncuentro: 'Estación San Antonio del Metro',
+        recomendaciones: 'Tenis cómodos (hay muchas escaleras), bloqueador, agua y efectivo para comprar algo a los emprendedores locales. No te separes del grupo.',
+        inscripcion: 'https://docs.google.com/forms/d/e/1FAIpQLSdygX2XQKuw-htT8151z9cEdzRRclVuh2M77V5-QonNKFuAAw/viewform'
+      },
+      {
+        id: 'picnic-parques-del-rio',
+        fecha: '2026-11-19',
+        fechaCorta: 'Jue 19 nov',
+        fechaLarga: 'Jueves 19 de noviembre',
+        nombre: 'Picnic en Parques del Río',
+        cuando: 'Tarde · 4:00 p. m.',
+        hora: '4:00 p. m.',
+        descripcion: 'Tarde de integración al aire libre en Parques del Río, el corredor verde a orillas del río Medellín. Un espacio para conocer a asistentes de otros capítulos antes del evento.',
+        valor: '$10.000 por persona',
+        valorCorto: '$10.000',
+        // El documento del comité no indica cupos para este plan.
+        lugar: 'Parques del Río, Medellín (cerca de la estación Industriales del Metro)',
+        duracion: '2 a 3 horas',
+        incluye: 'Snacks dulces, salados y bebidas',
+        puntoEncuentro: 'Parques del Río',
+        recomendaciones: 'Chaqueta ligera y sombrilla: en noviembre suele llover en la tarde.',
+        inscripcion: 'https://docs.google.com/forms/d/e/1FAIpQLSfEbA1vim943ipLDo25JEQfmDmfhy-ZvdEfjq9xOu4YHm6V2Q/viewform'
+      },
+      {
+        id: 'planchon-guatape',
+        fecha: '2026-11-20',
+        fechaCorta: 'Vie 20 nov',
+        fechaLarga: 'Viernes 20 de noviembre',
+        nombre: 'Planchón en Guatapé',
+        cuando: 'Salida 10:00 a. m. · Regreso 5:00 p. m.',
+        hora: '10:00 a. m. – 5:00 p. m.',
+        descripcion: 'Paseo en planchón por el embalse de Guatapé–El Peñol, uno de los paisajes más representativos de Antioquia, con música e integración a bordo.',
+        valor: '$110.000 por persona',
+        valorCorto: '$110.000',
+        cupos: '40',
+        horario: 'Salida de Medellín a las 10:00 a. m. y regreso a las 5:00 p. m.',
+        incluye: 'Transporte ida y vuelta hacia Medellín. Trayecto en el planchón y bebidas.',
+        puntoEncuentro: { texto: 'Por confirmar', porConfirmar: true },   // POR CONFIRMAR
+        recomendaciones: 'Documento de identidad, bloqueador, gorra, vestido de baño y ropa de cambio, efectivo para alimentación y snacks.',
+        inscripcion: 'https://docs.google.com/forms/d/e/1FAIpQLSfNFvij2Fbw3zVbmOuU7UZilp1FsUc49P9pP69x8XR3glYLpg/viewform'
+      },
+      {
+        id: 'pre-evento',
+        destacado: true,
+        fecha: '2026-11-20',
+        fechaCorta: 'Vie 20 nov',
+        fechaLarga: 'Viernes 20 de noviembre',
+        nombre: 'Pre-evento CONAL',
+        cuando: 'Noche · A partir de las 10 p. m.',
+        hora: 'Desde las 10 p. m.',
+        descripcion: 'Encuentro de bienvenida la noche antes de la convención. Las primeras 5 personas que compren su cupo en cada corte participan en un sorteo de 3 entradas gratis.',
+        valor: 'Depende de la etapa de compra de boleta',
+        valorCorto: 'Según etapa de boleta',
+        cupos: '200',
+        lugar: 'Discoteca ALMA',
+        recomendaciones: 'Descansa: al día siguiente la acreditación empieza a las 7:00 a. m. en la Universidad de Antioquia.',
+        // Sin formulario: el botón lleva al bloque de "Reservas e información".
+        botonSinInscripcion: 'Reservas e información'
+      },
+      {
+        id: 'tour-silletero',
+        fecha: '2026-11-24',
+        fechaCorta: 'Mar 24 nov',
+        fechaLarga: 'Martes 24 de noviembre',
+        nombre: 'Tour silletero en Santa Elena',
+        cuando: 'Todo el día · Después del evento',
+        hora: 'Todo el día',
+        descripcion: 'Día completo en el corregimiento de Santa Elena para conocer la tradición silletera, patrimonio cultural de Antioquia e inspiración de la identidad de CONAL Medellín 2026: fincas de flores, historia de las silletas y cultura campesina.',
+        // POR CONFIRMAR: el resumen del documento da ambas cifras y la ficha detallada solo la primera.
+        valor: { texto: 'Aprox. $110.000 con transporte / $40.000 sin transporte', porConfirmar: true },
+        valorCorto: { texto: '$110.000 / $40.000', porConfirmar: true },
+        cupos: '10 personas en adelante',
+        horario: { texto: 'Todo el día (hora de salida y regreso por confirmar)', porConfirmar: true },   // POR CONFIRMAR
+        incluye: 'Recorrido guiado por los cultivos de flores, acceso a zonas comunes, charla y armado de silleta. Transporte ida y vuelta.',
+        puntoEncuentro: 'Estación San Antonio del Metro',
+        recomendaciones: 'Santa Elena es más fría que Medellín: lleva chaqueta, impermeable y zapatos cerrados.',
+        inscripcion: 'https://docs.google.com/forms/d/e/1FAIpQLScB8TxeOXw9kXzMU6WOfxh2dPG0qV0pw8bpF8uTrnBdBn7aZQ/viewform'
       }
     ],
 
-    botonInscripcion: 'Inscríbete',
-    nota: 'Precios y horarios sujetos a confirmación. Cupos limitados.'
+    condiciones: {
+      titulo: 'Condiciones de participación',
+      items: [
+        'Los planes externos son opcionales y no están incluidos en el valor de la inscripción a CONAL.',
+        'El cupo se reserva únicamente con el pago confirmado. Los cupos son limitados y se asignan por orden de pago.',
+        'Cada asistente debe llevar su documento de identidad y su carné de EPS o seguro médico.',
+        'Durante el plan, el grupo se desplaza junto y sigue las indicaciones del staff acompañante.',
+        'Los horarios pueden ajustarse por clima o tráfico; cualquier cambio se anunciará por los canales oficiales.',
+        'Aplican las mismas normas de convivencia del evento.'
+      ]
+    },
+
+    reservas: {
+      titulo: 'Reservas e información',
+      items: [
+        { etiqueta: 'Logística Interna', nombre: 'Ana Isabel Angarita Escobar', valor: '322 527 0106', enlace: 'tel:+573225270106', icono: 'phone' },
+        { etiqueta: 'Finanzas (pagos)',  nombre: 'Juliana Agudelo Cuervo',      valor: '315 633 4193', enlace: 'tel:+573156334193', icono: 'phone' },
+        { etiqueta: 'Instagram',          valor: '@conalaneiap',     enlace: 'https://www.instagram.com/conalaneiap', icono: 'instagram' },
+        { etiqueta: 'Correo',             valor: 'conal@aneiap.co',  enlace: 'mailto:conal@aneiap.co',               icono: 'mail' }
+      ]
+    },
+
+    nota: 'Los valores son por persona y pueden ajustarse según el número final de inscritos.'
   },
 
   /* ─────────────────────────────────────────────────────────────────────────

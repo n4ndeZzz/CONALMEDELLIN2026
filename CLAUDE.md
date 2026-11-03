@@ -1,6 +1,6 @@
 # CONAL 2026 · Guía del Asistente
 
-Guía web del asistente para **CONAL 2026 – El Camino del Siletero · Medellín**, evento de ANEIAP.
+Guía web del asistente para **CONAL 2026 – El Camino del Silletero · Medellín**, evento de ANEIAP.
 Lema: **"Sembrando ideas, cosechando impacto"**.
 Fechas: **21, 22 y 23 de noviembre de 2026** (zona horaria America/Bogota).
 Idioma de la página: español de Colombia, trato de "tú".
@@ -8,7 +8,9 @@ Idioma de la página: español de Colombia, trato de "tú".
 ## Qué es este proyecto
 Una guía móvil del asistente (mobile-first), de una sola página con anclas, con la misma arquitectura de información que la referencia `https://guia-asistente-snc-baq-2026.vercel.app/` pero con la identidad visual de CONAL. De la referencia se copia la **estructura y los patrones de interacción**. No se copian sus colores, textos, imágenes ni identidad.
 
-Por ahora TODO el contenido es **placeholder** (cronograma, sedes, planes, transporte, tarifas, contactos, etc.). Debe poder cambiarse después editando un solo archivo (`content.js`).
+Todo el contenido vive en un solo archivo (`content.js`). Ya son datos reales: **cronograma**, **planes externos** y **logo** (Actualización 1). El resto (sedes, transporte, tarifas, contactos, etc.) sigue siendo placeholder.
+
+**Flujo de trabajo:** el equipo irá actualizando la información por rondas y soltando imágenes nuevas en `/assets/`. Cuando aparezca un archivo nuevo, Claude lo revisa (qué contiene, tamaño, fondo) y lo integra en la página: ruta en `content.js`, ubicación, `alt` y proporción, y actualiza `assets/LEEME.txt`.
 
 ## Stack y reglas técnicas
 - HTML + CSS + JavaScript vanilla. Sin framework y sin paso de build.
@@ -65,12 +67,12 @@ Defínelas como `--font-display`, `--font-script` y `--font-body`.
 - Si no hay assets reales, aproxima con SVG sencillos y deja un hueco claramente nombrado para reemplazarlos luego.
 
 ### Voz y tono
-Festivo, cercano y juvenil, con humor y color paisa/antioqueño ("siletero", "Sembrando ideas, cosechando impacto"). Frases cortas, imperativos amables ("Toca cada elemento para marcarlo"). Sin tono corporativo frío. Las fotos graciosas (los monos capuchinos disfrazados del feed) sirven para FAQ, bienvenida y cierre, no para información crítica como Emergencias.
+Festivo, cercano y juvenil, con humor y color paisa/antioqueño ("silletero", "Sembrando ideas, cosechando impacto"). Frases cortas, imperativos amables ("Toca cada elemento para marcarlo"). Sin tono corporativo frío. Las fotos graciosas (los monos capuchinos disfrazados del feed) sirven para FAQ, bienvenida y cierre, no para información crítica como Emergencias.
 
 ### Logos (ver `/assets/`)
 - `logo-conal` (palabra CONAL con la orquídea en la "O") y `lema` ("Sembrando ideas, cosechando impacto").
 - `logo-aneiap`.
-- `sello-conal` (círculo con aro arcoíris: "CONAL · El camino del siletero · Medellín 2026").
+- `sello-conal` (círculo con aro arcoíris: "CONAL · El camino del silletero · Medellín 2026").
 - Usa SVG o PNG con fondo transparente. No recrees ni modifiques los logos: se usan tal cual. Mientras no estén, deja `<img>` con un recuadro temporal que diga "LOGO".
 
 ## Estructura del sitio (resumen; el detalle está en PROMPT_INICIAL.md)

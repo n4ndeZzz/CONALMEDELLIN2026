@@ -1,7 +1,8 @@
 Archivos que la guia espera (sueltalos con este nombre exacto y aparecen solos):
 
 logos/
-  logo-conal.png      Palabra CONAL con la orquidea en la O (PNG/SVG con fondo transparente)
+  logo-conal.jpeg     [YA ESTA] Palabra CONAL con la orquidea en la O (1206x589, fondo blanco)
+  texto-conal.jpeg    [YA ESTA] Lema "Sembrando ideas, cosechando impacto" (1206x328, fondo blanco)
   logo-aneiap.png     Logo ANEIAP
   sello-conal.png     Sello circular "El camino del silletero"
   favicon.png         Icono de la pestana (32x32 o 180x180)

@@ -942,8 +942,15 @@ table{border-collapse:collapse;width:100%}
 .cierre h2 em{font-family:var(--font-script);font-style:normal;color:var(--amarillo);display:block;font-size:1.12em;margin-top:.05em}
 .cierre p{margin:6px auto 0;max-width:40ch;color:rgba(255,255,255,.9)}
 .cierre__btns{display:flex;flex-wrap:wrap;justify-content:center;gap:11px;margin-top:26px}
-.cierre__botanico{position:absolute;left:0;right:0;bottom:0;line-height:0;pointer-events:none}
-.cierre__botanico svg{width:100%;height:clamp(120px,26vw,180px);display:block}
+/* Borde floral: un racimo en cada esquina + franja baja al centro.
+   Los racimos no se recortan (en celular se superponen en el medio). */
+.cierre{padding-bottom:calc(var(--flora-h) + 24px);--flora-h:clamp(170px,30vw,260px)}
+.cierre__botanico{position:absolute;left:0;right:0;bottom:0;height:var(--flora-h);pointer-events:none}
+.flora{position:absolute;bottom:0;display:block;overflow:visible}
+.flora--centro{left:0;width:100%;height:50%}
+.flora--izq,.flora--der{height:100%;width:auto;aspect-ratio:480/260;max-width:66%}
+.flora--izq{left:0}
+.flora--der{right:0}
 
 .pie{background:var(--morado-profundo);color:rgba(255,255,255,.82);padding:34px 0 34px;text-align:center}
 .pie__in{max-width:var(--wrap);margin-inline:auto;padding-inline:var(--gutter);display:flex;flex-direction:column;align-items:center;gap:9px}
